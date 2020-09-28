@@ -67,5 +67,47 @@ d3.json("./samples.json").then((sampledata) => {
         width: 1000,
     };
     Plotly.newPlot("bubble", data1, layout1);
+
+    var wfreq = sampledata.metadata.map(d => d.wfreq)
+    console.log(wfreq)
+    var wfreq0 = wfreq[0]
+    console.log(wfreq0)
+
+    var data2 = [
+        {
+          type: "indicator",
+          mode: "gauge+number",
+          value: wfreq0,
+          title: { text: "Belly Button Washing Frequency", font: { size: 17 } },
+          gauge: {
+            axis: { range: [null, 9], tickwidth: 1, tickcolor: "darkblue" },
+            bar: { color: "darkblue" },
+            bgcolor: "white",
+            borderwidth: 2,
+            bordercolor: "gray",
+            steps: [
+              { range: [0, 2], color: "lightblue" },
+              { range: [2, 4], color: "skyblue" },
+              { range: [4, 6], color: "royalblue" },
+              { range: [6, 8], color: "blue" },
+              { range: [8, 9], color: "orange" }
+            ],
+            threshold: {
+              line: { color: "red", width: 4 },
+              thickness: 0.75,
+              value: 8.8
+            }
+          }
+        }
+      ];
+      
+      var layout2 = {
+        width: 500,
+        height: 400,
+        margin: { t: 25, r: 25, l: 25, b: 25 },
+        paper_bgcolor: "white",
+        font: { color: "black" }
+      };
+    Plotly.newPlot('gauge', data2, layout2);
 });
 
