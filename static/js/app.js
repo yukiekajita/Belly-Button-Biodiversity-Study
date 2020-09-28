@@ -1,3 +1,6 @@
+// Creating function for data plotting of bar, buggle, and gauge (bonus) with id
+function buildPlots(){
+
 // Use D3 fetch to read the JSON file
 // The data from the JSON file is arbitrarily named importedData as the argument
 d3.json("./samples.json").then((sampledata) => {
@@ -110,4 +113,61 @@ d3.json("./samples.json").then((sampledata) => {
       };
     Plotly.newPlot('gauge', data2, layout2);
 });
+}
 
+// Create another function to get the neccesary data
+function getInfo(sample){
+  // Use D3 fetch to read the JSON file
+  // The data from the JSON file is arbitrarily named importedData as the argument
+  d3.json("./samples.json").then((sampledata) => {
+  
+    // get metadata infor for the demographic panel
+    var metadata = sampledata.metadata;
+    console.log(metadata)
+
+    // filter metadata info by id
+    var filterIds = metadata.filter(meta => meta.id.toString() === sample)[0];
+
+    // select demographic panel in htlm file to put data
+    var demographicInfo = d3.select("#sample-metadata");
+
+    // empty the demographic info panel each time before getting new id info
+    demographicInfo.html("");
+
+    // grab the necessary demographic data for the id and append the info to the panel
+    Object.entries(filterIds).forEach((key) => {
+      demographicInfo.append("h5").text(key[0].toUpperCase() + ": " + key[1] + "\n");
+    });
+  });
+}
+
+// Create function for the initial data rendering
+function init() {
+
+  // select dropdown menu
+  var dropdown = d3.select("#selDataset");
+
+  // read data
+  d3.json("./samples.json").then((sampledata) => {
+  
+    // get id data for the dropdown menu
+    sampledata.names.forEach(function(name) {
+      dropdown.append("option").text(name).property("value", name);
+    });
+    
+    // use the first sample from the list to build the initial plots
+    var firstsample = sampledata[0];
+
+    // call the functions to display the data and the plots to the page
+    buildPlots(firstsample);
+    getInfo(firstsample);
+  });
+}
+
+// Create function for change event
+function optionChanged(newSample) {
+  buildPlots(newSample);
+  getInfo(newSample);
+};
+
+init();
