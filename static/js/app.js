@@ -1,18 +1,18 @@
 // Creating function for data plotting of bar, buggle, and gauge (bonus) with id
-function buildPlots(id){
+function getPlot(id){
 
 // Use D3 fetch to read the JSON file
 // The data from the JSON file is arbitrarily named importedData as the argument
 // d3.json(`/metadata/${sample}`).then((sampledata) => 
 d3.json("./samples.json").then((sampledata) => {
-    console.log(sampledata)
+    //console.log(sampledata)
     
     // Create a horizontal bar chart with id=940
     // filter sample values by id
-    var ids = sampledata.samples[0];
+    var ids = sampledata.samples[0]
     console.log(ids);
 
-    var sampleValues = ids.sample_values.slice(0,10).reverse();
+    var sampleValues = ids.sample_values.slice(0, 10).reverse();
     console.log(sampleValues);
 
     var otuIds = ids.otu_ids.slice(0,10).reverse();
@@ -74,14 +74,14 @@ d3.json("./samples.json").then((sampledata) => {
 
     var wfreq = sampledata.metadata.map(d => d.wfreq)
     console.log(wfreq)
-    var wfreq0 = wfreq[0]
-    console.log(wfreq0)
+    // var wfreq0 = wfreq
+    // console.log(wfreq0)
 
     var data2 = [
         {
           type: "indicator",
           mode: "gauge+number",
-          value: wfreq0,
+          value: parseFloat(wfreq),
           title: { text: "Belly Button Washing Frequency", font: { size: 17 } },
           gauge: {
             axis: { range: [null, 9], tickwidth: 1, tickcolor: "darkblue" },
@@ -142,6 +142,12 @@ function getInfo(id){
   });
 }
 
+// Create function for change event
+function optionChanged(id) {
+  getPlot(id);
+  getInfo(id);
+}
+
 // Create function for the initial data rendering
 function init() {
 
@@ -160,15 +166,9 @@ function init() {
     var firstsample = sampledata[0];
 
     // call the functions to display the data and the plots to the page
-    buildPlots(firstsample);
+    getPlot(firstsample);
     getInfo(firstsample);
   });
-}
-
-// Create function for change event
-function optionChanged(newSample) {
-  buildPlots(newSample);
-  getInfo(newSample);
 }
 
 init();
