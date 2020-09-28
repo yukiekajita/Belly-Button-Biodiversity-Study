@@ -1,8 +1,9 @@
 // Creating function for data plotting of bar, buggle, and gauge (bonus) with id
-function buildPlots(){
+function buildPlots(id){
 
 // Use D3 fetch to read the JSON file
 // The data from the JSON file is arbitrarily named importedData as the argument
+// d3.json(`/metadata/${sample}`).then((sampledata) => 
 d3.json("./samples.json").then((sampledata) => {
     console.log(sampledata)
     
@@ -116,7 +117,7 @@ d3.json("./samples.json").then((sampledata) => {
 }
 
 // Create another function to get the neccesary data
-function getInfo(sample){
+function getInfo(id){
   // Use D3 fetch to read the JSON file
   // The data from the JSON file is arbitrarily named importedData as the argument
   d3.json("./samples.json").then((sampledata) => {
@@ -126,7 +127,7 @@ function getInfo(sample){
     console.log(metadata)
 
     // filter metadata info by id
-    var filterIds = metadata.filter(meta => meta.id.toString() === sample)[0];
+    var filterIds = metadata.filter(meta => meta.id.toString() === id)[0];
 
     // select demographic panel in htlm file to put data
     var demographicInfo = d3.select("#sample-metadata");
@@ -151,7 +152,7 @@ function init() {
   d3.json("./samples.json").then((sampledata) => {
   
     // get id data for the dropdown menu
-    sampledata.names.forEach(function(name) {
+    sampledata.names.forEach((name) => {
       dropdown.append("option").text(name).property("value", name);
     });
     
@@ -168,6 +169,6 @@ function init() {
 function optionChanged(newSample) {
   buildPlots(newSample);
   getInfo(newSample);
-};
+}
 
 init();
