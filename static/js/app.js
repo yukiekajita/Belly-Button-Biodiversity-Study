@@ -5,24 +5,28 @@ function getPlot(id){
 // The data from the JSON file is arbitrarily named importedData as the argument
 // d3.json(`/metadata/${sample}`).then((sampledata) => 
 d3.json("./samples.json").then((sampledata) => {
-    //console.log(sampledata)
+    console.log(sampledata)
     
     // Create a horizontal bar chart with id=940
     // filter sample values by id
-    var ids = sampledata.samples[0]
+    var ids = sampledata.samples
     console.log(ids);
 
+  // filter metadata info by id
+    var id = ids.filter(s => s.id.toString() === id)[0];
+    console.log(id)
+
     var sampleValues = ids.sample_values.slice(0, 10).reverse();
-    console.log(sampleValues);
+    // console.log(sampleValues);
 
     var otuIds = ids.otu_ids.slice(0,10).reverse();
-    console.log(otuIds);
+    // console.log(otuIds);
 
     var chartLabels = otuIds.map(d => "OTU " + d)
-    console.log(`OTU IDs: ${chartLabels}`)
+    // console.log(`OTU IDs: ${chartLabels}`)
     
     var hovertextLabels = ids.otu_labels.slice(0,10).reverse();
-    console.log(hovertextLabels);
+    // console.log(hovertextLabels);
 
     var trace = {
         x: sampleValues,
@@ -73,7 +77,7 @@ d3.json("./samples.json").then((sampledata) => {
     Plotly.newPlot("bubble", data1, layout1);
 
     var wfreq = sampledata.metadata.map(d => d.wfreq)
-    console.log(wfreq)
+    // console.log(wfreq)
     // var wfreq0 = wfreq
     // console.log(wfreq0)
 
@@ -124,7 +128,7 @@ function getInfo(id){
   
     // get metadata infor for the demographic panel
     var metadata = sampledata.metadata;
-    console.log(metadata)
+    // console.log(metadata)
 
     // filter metadata info by id
     var filterIds = metadata.filter(meta => meta.id.toString() === id)[0];
@@ -140,12 +144,6 @@ function getInfo(id){
       demographicInfo.append("h5").text(key[0].toUpperCase() + ": " + key[1] + "\n");
     });
   });
-}
-
-// Create function for change event
-function optionChanged(id) {
-  getPlot(id);
-  getInfo(id);
 }
 
 // Create function for the initial data rendering
@@ -169,6 +167,12 @@ function init() {
     getPlot(firstsample);
     getInfo(firstsample);
   });
+}
+
+// Create function for change event
+function optionChanged(id) {
+  getPlot(id);
+  getInfo(id);
 }
 
 init();
