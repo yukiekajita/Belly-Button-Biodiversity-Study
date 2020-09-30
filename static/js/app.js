@@ -1,13 +1,12 @@
-// Creating function for data plotting of bar, buggle, and gauge (bonus) with id
+// Creating function for data plotting of bar, bubble, and gauge (bonus) graphs with id
 function buildPlot(id){
 
 // Use D3 fetch to read the JSON file
 // The data from the JSON file is arbitrarily named sampledata as the argument
-// d3.json(`/metadata/${sample}`).then((sampledata) => 
 d3.json("./samples.json").then((sampledata) => {
     console.log(sampledata)
     
-    // Used id=940 first for making charts then made corrections for functions
+    // Used id=940 first to make charts then made corrections for functions
     //ids0 = sampledata.samples[0]
     //console.log(ids0)
 
@@ -18,21 +17,23 @@ d3.json("./samples.json").then((sampledata) => {
     var obj = ids.filter(s => s.id.toString() === id)[0];
     console.log('obj: ',obj)
 
-    // var sampleValues = ids.map(id => id.sample_values);
-    // console.log(sampleValues)
-
+    // Grab sample_values with slice the array to get up to 10 values and reverse the order for graph
     var sampleValues = obj.sample_values.slice(0, 10).reverse();
     console.log(sampleValues);
 
+    // Grab otu_ids with slice the array to get up tp 10 valiues and reverse the order for graph
     var otuIds = obj.otu_ids.slice(0,10).reverse();
     console.log(otuIds);
 
+    // Set up otuIds for labeling chart by mapping
     var chartLabels = otuIds.map(d => "OTU " + d)
     console.log(`OTU IDs: ${chartLabels}`)
     
+    // Set up hover text labels for chart by slicing up to 10 values and reverse them for graph
     var hovertextLabels = obj.otu_labels.slice(0,10).reverse();
     console.log(hovertextLabels);
 
+    // Set up trace, data, and layout for horizontal Bar chart
     var trace = {
         x: sampleValues,
         y: chartLabels,
@@ -56,9 +57,10 @@ d3.json("./samples.json").then((sampledata) => {
             l: 100, r: 100, t: 100, b: 30
         }
     };
+    
     Plotly.newPlot("bar", data, layout);
 
-    // Create a bubble chart
+    // Create a bubble chart with trace 1, data1, and layout1
     var trace1 = {
         x: obj.otu_ids,
         y: obj.sample_values,
@@ -79,6 +81,7 @@ d3.json("./samples.json").then((sampledata) => {
         height: 600,
         width: 1000,
     };
+    
     Plotly.newPlot("bubble", data1, layout1);
 
     // Set up a gauge graph dataset   
@@ -87,7 +90,7 @@ d3.json("./samples.json").then((sampledata) => {
       // console.log('metadata: ',metadata)
       // test = metadata
     
-    // Set up filtering for metadata info for each id and make a list
+    // Set up filtering with metadata info for each id and make a list
     var filterIds = metadata.filter(obj => obj.id == id)[0];
 
     // Obtain wfreq info by mapping with metadata
@@ -98,6 +101,8 @@ d3.json("./samples.json").then((sampledata) => {
     // var wfreq0 = wfreq
     // console.log(wfreq0)
 
+    // Create a gauge graph with data 2 and layout
+    // reference: https://plotly.com/javascript/gauge-charts/
     var data2 = [
         {
           type: "indicator",
@@ -158,7 +163,7 @@ function metaInfo(id){
     // empty the demographic info panel each time before getting new id info
     demographicInfo.html("");
 
-    // grab the necessary demographic data for the id and append the info to the panel with a new line()
+    // grab the necessary demographic data for id and append the info to the panel with a new line()
     Object.entries(filterIds).forEach((key) => {
       demographicInfo.append("h5").text(key[0].toUpperCase() + ": " + key[1] + "\n");
     });
@@ -182,7 +187,7 @@ function init() {
     // use the first sample from the list to build the initial plots
     var firstsample = sampledata.names[0];
 
-    // call the functions to display the data and the plots to the page
+    // call the functions to display the data ID940 and the plots to the page
     buildPlot(firstsample);
     metaInfo(firstsample);
   });
