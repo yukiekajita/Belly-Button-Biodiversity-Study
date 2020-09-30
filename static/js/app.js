@@ -1,32 +1,37 @@
 // Creating function for data plotting of bar, buggle, and gauge (bonus) with id
-function getPlot(id){
+function buildPlot(id){
 
 // Use D3 fetch to read the JSON file
-// The data from the JSON file is arbitrarily named importedData as the argument
+// The data from the JSON file is arbitrarily named sampledata as the argument
 // d3.json(`/metadata/${sample}`).then((sampledata) => 
 d3.json("./samples.json").then((sampledata) => {
     console.log(sampledata)
     
-    // Create a horizontal bar chart with id=940
-    // filter sample values by id
+    // Used id=940 first for making charts then made corrections for functions
+    //ids0 = sampledata.samples[0]
+    //console.log(ids0)
+
     var ids = sampledata.samples
-    console.log(ids);
+    console.log('ids: ',id);
 
-  // filter metadata info by id
-    var id = ids.filter(s => s.id.toString() === id)[0];
-    console.log(id)
+    // filter metadata info by id
+    var obj = ids.filter(s => s.id.toString() === id)[0];
+    console.log('obj: ',obj)
 
-    var sampleValues = ids.sample_values.slice(0, 10).reverse();
-    // console.log(sampleValues);
+    // var sampleValues = ids.map(id => id.sample_values);
+    // console.log(sampleValues)
 
-    var otuIds = ids.otu_ids.slice(0,10).reverse();
-    // console.log(otuIds);
+    var sampleValues = obj.sample_values.slice(0, 10).reverse();
+    console.log(sampleValues);
+
+    var otuIds = obj.otu_ids.slice(0,10).reverse();
+    console.log(otuIds);
 
     var chartLabels = otuIds.map(d => "OTU " + d)
-    // console.log(`OTU IDs: ${chartLabels}`)
+    console.log(`OTU IDs: ${chartLabels}`)
     
-    var hovertextLabels = ids.otu_labels.slice(0,10).reverse();
-    // console.log(hovertextLabels);
+    var hovertextLabels = obj.otu_labels.slice(0,10).reverse();
+    console.log(hovertextLabels);
 
     var trace = {
         x: sampleValues,
@@ -55,12 +60,12 @@ d3.json("./samples.json").then((sampledata) => {
 
     // Create a bubble chart
     var trace1 = {
-        x: ids.otu_ids,
-        y: ids.sample_values,
+        x: obj.otu_ids,
+        y: obj.sample_values,
         mode: "markers",
         marker: {
-            size: ids.sample_values,
-            color: ids.otu_ids
+            size: obj.sample_values,
+            color: obj.otu_ids
         },
         text: ids.otu_labels
         };
@@ -76,8 +81,20 @@ d3.json("./samples.json").then((sampledata) => {
     };
     Plotly.newPlot("bubble", data1, layout1);
 
-    var wfreq = sampledata.metadata.map(d => d.wfreq)
-    // console.log(wfreq)
+    // Set up a gauge graph dataset   
+    // First, get metadata info 
+    var metadata = sampledata.metadata;
+      // console.log('metadata: ',metadata)
+      // test = metadata
+    
+    // Set up filtering for metadata info for each id and make a list
+    var filterIds = metadata.filter(obj => obj.id == id)[0];
+
+    // Obtain wfreq info by mapping with metadata
+    var wfreq = metadata.map(d => d.wfreq)
+    console.log(wfreq)
+    
+    // Used wfrew0 for making a graph first, and then connected with functions
     // var wfreq0 = wfreq
     // console.log(wfreq0)
 
@@ -85,10 +102,10 @@ d3.json("./samples.json").then((sampledata) => {
         {
           type: "indicator",
           mode: "gauge+number",
-          value: parseFloat(wfreq),
-          title: { text: "Belly Button Washing Frequency", font: { size: 17 } },
+          value: filterIds.wfreq,
+          title: { text: "Belly Button Washing Frequency", font: {size: 17}},
           gauge: {
-            axis: { range: [null, 9], tickwidth: 1, tickcolor: "darkblue" },
+            axis: { range: [null, 9], tickwidth: 1, tickcolor: "darkblue"},
             bar: { color: "darkblue" },
             bgcolor: "white",
             borderwidth: 2,
@@ -119,19 +136,21 @@ d3.json("./samples.json").then((sampledata) => {
     Plotly.newPlot('gauge', data2, layout2);
 });
 }
+// var test;
 
-// Create another function to get the neccesary data
-function getInfo(id){
+// Create another function to get the neccesary data for demographic info panel
+function metaInfo(id){
   // Use D3 fetch to read the JSON file
-  // The data from the JSON file is arbitrarily named importedData as the argument
+  // The data from the JSON file is arbitrarily named sampledata as the argument
   d3.json("./samples.json").then((sampledata) => {
   
     // get metadata infor for the demographic panel
     var metadata = sampledata.metadata;
-    // console.log(metadata)
-
+    // console.log('metadata: ',metadata)
+    test = metadata
     // filter metadata info by id
-    var filterIds = metadata.filter(meta => meta.id.toString() === id)[0];
+
+    var filterIds = metadata.filter(obj => obj.id == id)[0];
 
     // select demographic panel in htlm file to put data
     var demographicInfo = d3.select("#sample-metadata");
@@ -139,7 +158,7 @@ function getInfo(id){
     // empty the demographic info panel each time before getting new id info
     demographicInfo.html("");
 
-    // grab the necessary demographic data for the id and append the info to the panel
+    // grab the necessary demographic data for the id and append the info to the panel with a new line()
     Object.entries(filterIds).forEach((key) => {
       demographicInfo.append("h5").text(key[0].toUpperCase() + ": " + key[1] + "\n");
     });
@@ -161,18 +180,18 @@ function init() {
     });
     
     // use the first sample from the list to build the initial plots
-    var firstsample = sampledata[0];
+    var firstsample = sampledata.names[0];
 
     // call the functions to display the data and the plots to the page
-    getPlot(firstsample);
-    getInfo(firstsample);
+    buildPlot(firstsample);
+    metaInfo(firstsample);
   });
 }
 
 // Create function for change event
 function optionChanged(id) {
-  getPlot(id);
-  getInfo(id);
+  buildPlot(id);
+  metaInfo(id);
 }
 
 init();
